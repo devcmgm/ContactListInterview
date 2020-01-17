@@ -1,12 +1,26 @@
 import React, { Component } from "react";
+import { Route, BrowserRouter as Router } from 'react-router-dom'
 import "./App.css";
 import ContactList from "./Components/ContactList";
+import MessageRequired from "./Components/MessageRequired"
 
 class App extends Component {
+
+  routing = (
+    <Router>
+      <div>
+        <Route path="/" component={App} />
+        <Route path="/addContact" component={App} />
+        <Route path="/deleteContact" component={App} />
+      </div>
+    </Router>
+  )
+
   constructor() {
     super();
 
     this.state = {
+      showmsg: false,
       fname: "",
       lname: "",
       email: "",
@@ -41,7 +55,12 @@ class App extends Component {
     this.handleAddItem = event => {
       event.preventDefault();
 
-      if (this.state.fname === "") return;
+      if (this.state.fname === "" ||
+      this.state.lname === "" ||
+      this.state.email === "" ||
+      this.state.phone === "" ) { 
+         return
+      } else {
 
       const newItem = {
         item: {
@@ -54,6 +73,10 @@ class App extends Component {
         }
       };
 
+    fetch("/addContact")
+    .then(res => (res.ok ? res : Promise.reject(res)))
+    //.then(res => res.json())
+
       this.setState(prevState => ({
         items: prevState.items.concat(newItem),
         fname: "",
@@ -61,6 +84,7 @@ class App extends Component {
         email: "",
         phone: ""
       }));
+    }
     };
 
     this.handleMarkItemComplete = itemId => {
@@ -86,7 +110,7 @@ class App extends Component {
     };
   }
 
-  render() {
+  render(routing) {
     const btn_style = {
       marginLeft: "10px",
       marginBottom: "5px"
@@ -146,6 +170,8 @@ class App extends Component {
                 markItemComplete={this.handleMarkItemComplete}
               />
             </div>
+            <MessageRequired style={this.state.showmsg ? {} : { display: 'none' }} />
+       
           </div>
           <div className="col-md-4" />
         </div>
